@@ -5,7 +5,7 @@ Description: Test RDS template
   
 
 Metadata:
-  AWS::CloudFromation::Interface:
+  AWS::CloudFormation::Interface:
   ParameterGroups:
     - Label:
         default: 'Export VPC Stack Name'
