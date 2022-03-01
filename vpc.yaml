@@ -72,7 +72,7 @@ Parameters:
       MinLength: '9'
       Type: String
   
-  VPCStackName:
+  VpcStackName:
       Description: The name of the VPC stack
       Type: String
       Default: vpc-stack
@@ -314,7 +314,7 @@ Outputs:
     Description: Private Subnet 4 ID
     Export:
       Name: !Sub ${AWS::StackName}-PrivateSubnet4
-    Value: !Ref PrivateSubnet
+    Value: !Ref PrivateSubnet4
   ALBSecurityGroup:
     Description: ALB Security Group ID
     Export:
