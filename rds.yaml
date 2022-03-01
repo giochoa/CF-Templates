@@ -10,7 +10,7 @@ Metadata:
     - Label:
         default: 'Export VPC Stack Name'
       Parameters:
-        - ExportVPCStackName
+        - ExportVpcStackName
     - Label:
         default: 'Database Parameters'
       Parameters:
