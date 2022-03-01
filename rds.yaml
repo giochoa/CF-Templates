@@ -8,11 +8,11 @@ Metadata:
   AWS::CloudFromation::Interface:
   ParameterGroups:
     - Label:
-        default: Export VPC Stack Name
+        default: 'Export VPC Stack Name'
       Parameters:
         - ExportVPCStackName
     - Label:
-        default: Database Parameters
+        default: 'Database Parameters'
       Parameters:
         - DatabaseInstanceIdentifier
         - DatabaseName
