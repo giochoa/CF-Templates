@@ -1,0 +1,63 @@
+AWSTemplateFormatVersion: "2010-09-09"
+
+Description: This will create a Nat Gateway on each public subnet
+
+Parameters:
+  ExportVpcStackName:
+    Description: The vpc we are gonna be associatting this Nat.
+    Type: String
+
+Resources:
+  
+  NatGateWay1EIP:
+    Type: AWS::EC2::EIP
+    Properties:
+      Domain: VPC
+      Tags:
+        - Key: Name
+          Value: EIP1
+
+  NatGateWay2EIP:
+    Type: AWS::EC2::EIP
+    Properties:
+      Domain: VPC
+      Tags:
+        - Key: Name
+          Value: EIP2
+
+  NatGateWay1:
+    Type: AWS::EC2::NatGateway
+    Properties:
+      AllocationId: !GetAtt NatGateWay1EIP.AllocationId
+      SubnetId: 
+        Fn::ImportValue: !Sub ${ExportVpcStackName}-PublicSubnet1
+      Tags:
+        - Key: Name
+          Value: NatGateWay Public Subnet 1
+
+  NatGateWay2:
+    Type: AWS::EC2::NatGateway
+    Properties:
+      AllocationId: !GetAtt NatGateWay2EIP.AllocationId
+      SubnetId:
+        Fn::ImportValue: !Sub ${ExportVpcStackName}-PublicSubnet2
+      Tags:
+        - Key: Name
+          Value: NatGateWay Public Subnet 2
+
+  PrivateRoutetable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      Tags:
+        - Key: Name
+          Value: Private Route Table 1
+      VpcId: 
+        Fn::ImportValue: !Sub ${ExportVpcStackName}-VPC
+
+  PrivateRoute1:
+    Type: AWS::EC2::Route                                  
+    Properties:
+      DestinationCIDR: 0.0.0.0/0
+      NatGatewayId: !Ref NatGateWay1
+      RouteTableId: !Ref PrivateRouteTable1
+      

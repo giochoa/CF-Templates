@@ -1,0 +1,149 @@
+
+AWSTemplateFormatVersion: "2010-09-09"
+
+Description: Test RDS template
+  
+
+Metadata:
+  AWS::CloudFromation::Interface:
+  ParameterGroups:
+    - 
+      Label:
+        default: Export VPC Stack Name
+      Parameters:
+        - ExportVPCStackName
+    -
+      Label:
+        default: Database Parameters
+      Parameters:
+        - DatabaseInstanceIdentifier
+        - DatabaseName
+        - DatabaseUser
+        - DatabasePassword
+        - DatabaseBackUpRetentionPeriod
+        - DatabaseAllocatedStorage
+        - DatabaseInstanceClass
+        - MultiAZDatabase
+
+Parameters:
+  ExportVpcStackName:
+    Description: The name of the vpc stack that exports values
+    Type: String
+  #Settings
+  DatabaseInstanceIdentifier:
+    AllowedPattern: "[a-zA-Z][a-zA-Z0-9]*" # Alphanumeric characters
+    ConstraintDescription: must begin with a letter and contain only alphanumeric characters.
+    Default: aurora-test
+    Description: instance identifier
+    MaxLength: 64
+    MinLength: 1
+    Type: String
+  #Addtional configuration.
+  DatabaseName:
+    AllowedPattern: "[a-zA-Z][a-zA-Z0-9]*" # Alphanumeric characters
+    ConstraintDescription: must begin with a letter and contain only alphanumeric characters.
+    Default: auroradb
+    Description: aurora database name
+    MaxLength: 64
+    MinLength: 1
+    Type: String
+  #Credentials Settings
+  DatabaseUser:
+    AllowedPattern: "[a-zA-Z][a-zA-Z0-9]*" # Alphanumeric characters
+    ConstraintDescription: must begin with a letter and contain only alphanumeric characters.
+    Default: "user1"
+    Description: aurora database user
+    MaxLength: 16
+    MinLength: 1
+    NoEcho: true
+    Type: String
+  #Credentials Settings
+  DatabasePassword:
+    AllowedPattern: "[a-zA-Z0-9]*"
+    ConstraintDescription: must contain only alphanumeric characters.
+    Default: "password"
+    Description: aurora database password
+    MaxLength: 41
+    MinLength: 8
+    NoEcho: true
+    Type: String
+  #Backup Settings
+  DatabaseBackupRetentionPeriod:
+    ConstraintDescription: must be between 0 and 35 days.
+    Default: 0
+    Description: The number of days to retain automated DB snapshots.
+    MaxValue: 35
+    MinValue: 0
+    Type: Number
+  #Storage Settings
+  DatabaseAllocatedStorage:
+    ConstraintDescription: must be between 5 and 1024 GB.
+    Default: 5
+    Description: The size of the database (in GB).
+    MaxValue: 1024
+    MinValue: 5
+    Type: Number
+  #DB instance Settings
+  DatabaseInstance:  
+    AllowedValues: 
+      - db.t2.micro
+      - db.t2.small
+      - db.t2.medium
+      - db.t2.large
+      - db.t2.xlarge
+      - db.t2.2xlarge
+    ConstraintDescription: must be a valid database instance type.
+    Default: db.t2.micro
+    Description: The instance type of the database.
+    Type: String
+ #Availability & Durability Settings
+  MultiAZDatabase:
+    AllowedValues:
+      - true
+      - false
+    ConstraintDescription: must be true or false.  
+    Default: false
+    Description: Create a multi-AZ deployment.
+    Type: Boolean   
+Conditions:
+  
+
+
+Resources:
+   DatabaseSubnetGroup:
+     Type: AWS::RDS::DBSubnetGroup
+     Properties:
+       DBSubnetGroupDescription: Database Subnet Group
+       SubnetIds:
+          - Fn::ImportValue: !Sub ${ExportVPCStackName}-PrivateSubnet3 #We need to import the value of the VPC stacks private subnet.
+          - Fn::ImportValue: !Sub ${ExportVPCStackName}-PrivateSubnet4 #We need to import the value of the VPC stacks private subnet.
+       Tags:
+         - Key: Name
+           Value: aurora-subnet-group
+
+   DatabaseInstance:
+      Type: AWS::RDS::DBInstance
+      Properties:
+        AllocatedStorage: !Ref DatabaseAllocatedStorage
+        AvailabilityZone: !Select [0, !GetAZs '' ] #Here we are selecting the first AZ in the list.
+        BackupRetentionPeriod: !Ref DatabaseBackupRetentionPeriod
+        DBInstanceClass: !Ref DatabaseInstanceClass
+        DBInstanceIdentifier: !Ref DatabaseInstanceIdentifier
+        DBName: !Ref DatabaseName
+        DBSubnetGroupName: !Ref DatabaseSubnetGroup
+        Engine: aurora
+        EngineVersion: 5.6.10a
+        MasterUsername: !Ref DatabaseUser
+        MasterUserPassword: !Ref DatabasePassword
+        MultiAZ: !Ref MultiAZDatabase
+        PreferredBackupWindow: 07:00-08:00
+        PreferredMaintenanceWindow: Mon:06:00-Mon:06:30
+        StorageEncrypted: true
+        Tags:
+          - Key: Name
+            Value: aurora-database
+        VPCSecurityGroups:
+          - Fn::ImportValue: !Sub ${ExportVPCStackName}-DataBaseSecurityGroup #We need to import the value of the VPC stacks security group.        
+
+   
+  
