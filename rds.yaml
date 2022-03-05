@@ -5,25 +5,23 @@ Description: Test RDS template
   
 
 Metadata:
-  AWS::CloudFromation::Interface:
-  ParameterGroups:
-    - 
-      Label:
-        default: Export VPC Stack Name
-      Parameters:
-        - ExportVPCStackName
-    -
-      Label:
-        default: Database Parameters
-      Parameters:
-        - DatabaseInstanceIdentifier
-        - DatabaseName
-        - DatabaseUser
-        - DatabasePassword
-        - DatabaseBackUpRetentionPeriod
-        - DatabaseAllocatedStorage
-        - DatabaseInstanceClass
-        - MultiAZDatabase
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label:
+          default: 'Export VPC Stack Name'
+        Parameters:
+          - ExportVpcStackName
+      - Label:
+          default: 'Database Parameters'
+        Parameters:
+          - DatabaseInstanceIdentifier
+          - DatabaseName
+          - DatabaseUser
+          - DatabasePassword
+          - DatabaseBackUpRetentionPeriod
+          - DatabaseAllocatedStorage
+          - DatabaseInstanceClass
+          - MultiAZDatabase
 
 Parameters:
   ExportVpcStackName:
@@ -105,7 +103,7 @@ Parameters:
     Default: false
     Description: Create a multi-AZ deployment.
     Type: Boolean   
-Conditions:
+# Conditions:
   
 
 
