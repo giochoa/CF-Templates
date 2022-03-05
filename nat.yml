@@ -45,7 +45,7 @@ Resources:
         - Key: Name
           Value: NatGateWay Public Subnet 2
 
-  PrivateRoutetable:
+  PrivateRoutetable1:
     Type: AWS::EC2::RouteTable
     Properties:
       Tags:
@@ -61,3 +61,33 @@ Resources:
       NatGatewayId: !Ref NatGateWay1
       RouteTableId: !Ref PrivateRouteTable1
       
+  PrivateSubnet1RouteTableAssociation:
+    Type:AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PrivateRouteTable1
+      SubnetId: 
+        Fn::ImportValue: !Sub ${ExportVpcStackName}-PrivateSubnet1 
+
+  PrivateRoutetable2:
+      Type: AWS::EC2::RouteTable
+      Properties:
+        Tags:
+          - Key: Name
+            Value: Private Route Table 2
+        VpcId: 
+          Fn::ImportValue: !Sub ${ExportVpcStackName}-VPC
+
+  PrivateRoute2:
+    Type: AWS::EC2::Route                                  
+    Properties:
+      DestinationCIDR: 0.0.0.0/0
+      NatGatewayId: !Ref NatGateWay2
+      RouteTableId: !Ref PrivateRouteTable2
+        
+  PrivateSubnet2RouteTableAssociation:
+    Type:AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PrivateRouteTable2
+      SubnetId: 
+        Fn::ImportValue: !Sub ${ExportVpcStackName}-PrivateSubnet2        
+
